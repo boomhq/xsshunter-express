@@ -52,6 +52,10 @@ const SCREENSHOT_FILENAME_REGEX = new RegExp(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]
 async function get_app_server() {
 	const app = express();
 
+    if(process.env.BEHIND_PROXY  === "true" ){
+        app.set('trust proxy', process.env.BEHIND_PROXY_TRUSTED_IPS)
+    }
+
 	// I have a question for Express:
 	// https://youtu.be/ZtjFsQBuJWw?t=4
 	app.set('case sensitive routing', true);
