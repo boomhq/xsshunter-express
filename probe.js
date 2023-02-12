@@ -18,9 +18,13 @@ $$ |      $$ |$$   ____|$$  __$$ | \____$$\ $$   ____|      $$ |  $$ |$$   ____|
 $$ |      $$ |\$$$$$$$\ \$$$$$$$ |$$$$$$$  |\$$$$$$$\       $$ |  $$ |\$$$$$$$\ \$$$$$$$ |\$$$$$$$ |
 \__|      \__| \_______| \_______|\_______/  \_______|      \__|  \__| \_______| \_______| \_______|
 
-This is a payload to test for Cross-site Scripting (XSS). It is meant to be used by security professionals and bug bounty hunters.
+ _____                                       _
+/ _  / ___  _ __   ___       _ __ ___   ___ | |_
+\// / / _ \| '_ \ / _ \_____| '__/ _ \ / _ \| __|
+ / //\ (_) | | | |  __/_____| | | (_) | (_) | |_
+/____/\___/|_| |_|\___|     |_|  \___/ \___/ \__|
 
-This is a self-hosted instance of XSS Hunter Express. It is not the same as the XSS Hunter website.
+
 */
 
 // FormData polyfill https://github.com/jimmywarting/FormData
