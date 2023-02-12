@@ -16,6 +16,8 @@ const api = require('./api.js');
 const validate = require('express-jsonschema').validate;
 const constants = require('./constants.js');
 
+
+
 function set_secure_headers(req, res) {
 	res.set("X-XSS-Protection", "mode=block");
 	res.set("X-Content-Type-Options", "nosniff");
@@ -166,46 +168,52 @@ async function get_app_server() {
     	}
     };
     app.post('/js_callback', upload.single('screenshot'), validate({body: JSCallbackSchema}), async (req, res) => {
-		res.set("Access-Control-Allow-Origin", "*");
-		res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-		res.set("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");
-		res.set("Access-Control-Max-Age", "86400");
+        res.set("Access-Control-Allow-Origin", "*");
+        res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+        res.set("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");
+        res.set("Access-Control-Max-Age", "86400");
 
-		// Send the response immediately, they don't need to wait for us to store everything.
-		res.status(200).json({
-			"status": "success"
-		}).end();
+        // Send the response immediately, they don't need to wait for us to store everything.
+        res.status(200).json({
+            "status": "success"
+        }).end();
 
-    	// Multer stores the image in the /tmp/ dir. We use this source image
-    	// to write a gzipped version in the user-provided dir and then delete
-    	// the original uncompressed image.
-    	const payload_fire_image_id = uuid.v4();
-    	const payload_fire_image_filename = `${SCREENSHOTS_DIR}/${payload_fire_image_id}.png.gz`;
-    	const multer_temp_image_path = req.file.path;
+        // Multer stores the image in the /tmp/ dir. We use this source image
+        // to write a gzipped version in the user-provided dir and then delete
+        // the original uncompressed image.
+        const payload_fire_image_id = uuid.v4();
+        const payload_fire_image_filename = `${SCREENSHOTS_DIR}/${payload_fire_image_id}.png.gz`;
+        const multer_temp_image_path = req.file.path;
 
-    	// We also gzip the image so we don't waste disk space
-    	const gzip = zlib.createGzip();
-    	const output_gzip_stream = fs.createWriteStream(payload_fire_image_filename);
-    	const input_read_stream = fs.createReadStream(multer_temp_image_path);
+        // We also gzip the image so we don't waste disk space
+        const gzip = zlib.createGzip();
+        const output_gzip_stream = fs.createWriteStream(payload_fire_image_filename);
+        const input_read_stream = fs.createReadStream(multer_temp_image_path);
 
-    	// When the "finish" event is called we delete the original
-    	// uncompressed image file left behind by multer.
-    	input_read_stream.pipe(gzip).pipe(output_gzip_stream).on('finish', async (error) => {
-    		if(error) {
-    			console.error(`An error occurred while writing the XSS payload screenshot (gzipped) to disk:`);
-    			console.error(error);
-    		}
+        // When the "finish" event is called we delete the original
+        // uncompressed image file left behind by multer.
+        input_read_stream.pipe(gzip).pipe(output_gzip_stream).on('finish', async (error) => {
+            if(error) {
+                console.error(`An error occurred while writing the XSS payload screenshot (gzipped) to disk:`);
+                console.error(error);
+            }
 
-    		console.log(`Gzip stream complete, deleting multer temp file: ${multer_temp_image_path}`);
+            console.log(`Gzip stream complete, deleting multer temp file: ${multer_temp_image_path}`);
 
-    		await asyncfs.unlink(multer_temp_image_path);
-    	});
+            await asyncfs.unlink(multer_temp_image_path);
+        });
+
+        let clientIp = req.connection.remoteAddress.toString()
+        
+        if(process.env.BEHIND_PROXY  === "true" ){
+           clientIp = req.ip
+        }
 
     	const payload_fire_id = uuid.v4();
 		var payload_fire_data = {
 			id: payload_fire_id,
 			url: req.body.uri,
-			ip_address: req.connection.remoteAddress.toString(),
+            ip_address: clientIp,
 			referer: req.body.referrer,
 			user_agent: req.body['user-agent'],
 			cookies: req.body.cookies,
