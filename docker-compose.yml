@@ -14,7 +14,7 @@ services:
       - SSL_CONTACT_EMAIL=YourEmail@gmail.com
       # BEHIND PROXY
       - BEHIND_PROXY=true
-      - BEHIND_PROXY_TRUSTED_IPS=localhost,10.10.10.1
+      - BEHIND_PROXY_TRUSTED_IPS=127.0.0.1,10.10.10.1
       # Maximum XSS callback payload size
       # This includes the webpage screenshot, DOM HTML,
       # page text, and other metadata. Note that if the
